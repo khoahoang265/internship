@@ -314,6 +314,18 @@ var saveText = {local:'Lưu trên máy này', saving:'Đang lưu…', saved:'Đ�
 var CFG_KEY = 'bosch-intern-supabase', DONE_KEY = 'bosch-intern-done';
 var cfg = null, lastError = '';
 try { cfg = JSON.parse(localStorage.getItem(CFG_KEY) || 'null'); } catch(e){}
+// Nhận cấu hình từ link chia sẻ: <trang>#sync=<base64>
+try {
+  var hs = (location.hash || '').match(/sync=([A-Za-z0-9_\-=]+)/);
+  if(hs){
+    var o = JSON.parse(atob(hs[1].replace(/-/g,'+').replace(/_/g,'/')));
+    if(o && o.url && o.key){
+      cfg = {url: o.url, key: o.key};
+      localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
+      history.replaceState(null, '', location.pathname + location.search);
+    }
+  }
+} catch(e){}
 
 function setSave(s, err){
   saveState = s; if(s === 'error' && err) lastError = err;
@@ -432,6 +444,7 @@ function buildDialog(){
     + '<div class="modal-row"><button class="btn primary" id="cfg-save" type="button">Lưu và đồng bộ</button>'
     + '<button class="btn" id="cfg-check" type="button">Kiểm tra kết nối</button>'
     + '<button class="btn" id="cfg-clear" type="button">Tắt đồng bộ</button>'
+    + '<button class="btn" id="cfg-link" type="button">Copy link cho điện thoại</button>'
     + '<button class="btn" id="cfg-export" type="button">Xuất file JSON</button>'
     + '<label class="btn" for="cfg-import">Nhập file JSON</label><input type="file" id="cfg-import" accept="application/json" hidden>'
     + '<button class="btn" id="cfg-close" type="button">Đóng</button></div>'
@@ -448,6 +461,16 @@ function buildDialog(){
     lastError = ''; render(); pull().then(()=>{ if(saveState === 'error') say(lastError, 'bad'); else d.hidden = true; });
   };
   d.querySelector('#cfg-clear').onclick = ()=>{ cfg = null; lastError = ''; try{ localStorage.removeItem(CFG_KEY); }catch(e){} d.hidden = true; setSave('local'); render(); };
+  d.querySelector('#cfg-link').onclick = ()=>{
+    var url = baseUrl(d.querySelector('#cfg-url').value), key = d.querySelector('#cfg-key').value.trim();
+    if(!url || !key) return say('Điền Project URL và key trước đã.', 'bad');
+    if(location.protocol === 'file:') return say('Link chỉ dùng được khi trang chạy trên web (GitHub Pages). Trang này đang mở từ ổ đĩa nên điện thoại không mở được.', 'bad');
+    var tok = btoa(JSON.stringify({url: url, key: key})).replace(/\+/g,'-').replace(/\//g,'_');
+    var link = location.origin + location.pathname + '#sync=' + tok;
+    var done2 = ()=> say('Đã copy link. Gửi nó cho chính mình qua Zalo/Messenger/email, mở trên điện thoại là đồng bộ luôn. Link có chứa key nên đừng đăng công khai.', 'ok');
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done2, ()=>say(link, ''));
+    else say(link, '');
+  };
   d.querySelector('#cfg-export').onclick = ()=>{
     var blob = new Blob([JSON.stringify({done:[...done], exportedAt:new Date().toISOString()}, null, 2)], {type:'application/json'});
     var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'tien-do-thuc-tap.json'; a.click();
