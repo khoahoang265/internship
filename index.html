@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lộ trình thực tập Bosch</title>
+<link id="app-fonts" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style id="app-style">
+:root{
+  --ground:#F3F5F7; --surface:#FFFFFF; --sunk:#E9EDF1; --line:#D6DDE3;
+  --ink:#15212C; --muted:#5A6874; --faint:#8894A0;
+  --accent:#0C6B74; --accent-soft:#DDEFF0; --on-accent:#FFFFFF;
+  --late:#B23A2E; --late-soft:#F8E3E0; --soon:#A25A0F; --soon-soft:#F7EBD9;
+  --ok:#2C7A4B; --ok-soft:#E0F0E6;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F161C; --surface:#172129; --sunk:#1E2A33; --line:#2A3843;
+    --ink:#E4EAEF; --muted:#9BA8B3; --faint:#6F7C87;
+    --accent:#4FB8C2; --accent-soft:#16363B; --on-accent:#0B1418;
+    --late:#F08A7E; --late-soft:#3A1F1C; --soon:#E7AE62; --soon-soft:#352A18;
+    --ok:#6CC592; --ok-soft:#16301F; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F161C; --surface:#172129; --sunk:#1E2A33; --line:#2A3843;
+  --ink:#E4EAEF; --muted:#9BA8B3; --faint:#6F7C87;
+  --accent:#4FB8C2; --accent-soft:#16363B; --on-accent:#0B1418;
+  --late:#F08A7E; --late-soft:#3A1F1C; --soon:#E7AE62; --soon-soft:#352A18;
+  --ok:#6CC592; --ok-soft:#16301F; color-scheme:dark;
+}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.55 "Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif}
+.mono{font-family:"JetBrains Mono",ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 64px}
+header.top{display:grid;gap:18px;margin-bottom:28px}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-size:clamp(26px,4vw,36px);line-height:1.15;margin:4px 0 0;text-wrap:balance;font-weight:700}
+.sub{color:var(--muted);margin:6px 0 0;max-width:68ch}
+.status{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:6px;align-content:start}
+.stat .k{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.stat .v{font-size:22px;font-weight:700}
+.bar{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .3s}
+.next-title{font-weight:600;line-height:1.35}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin:0 0 16px}
+.seg{display:inline-flex;background:var(--sunk);border-radius:8px;padding:3px}
+.seg button{font:inherit;font-size:13px;font-weight:500;border:0;background:transparent;color:var(--muted);padding:6px 12px;border-radius:6px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgb(0 0 0/.08)}
+.save{font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.save::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--faint)}
+.save[data-s="saving"]::before{background:var(--soon)}
+.save[data-s="saved"]::before{background:var(--ok)}
+.save[data-s="local"]::before{background:var(--faint)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:28px;align-items:start}
+@media (max-width:900px){.layout{grid-template-columns:1fr}}
+.phase{position:relative;padding-left:30px;padding-bottom:26px}
+.phase::before{content:"";position:absolute;left:8px;top:22px;bottom:0;width:2px;background:var(--line)}
+.phase:last-child::before{display:none}
+.phase .node{position:absolute;left:0;top:4px;width:18px;height:18px;border-radius:50%;border:2px solid var(--line);background:var(--ground)}
+.phase[data-state="done"] .node{background:var(--ok);border-color:var(--ok)}
+.phase[data-state="now"] .node{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.phase-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin-bottom:10px}
+.phase-head h2{font-size:18px;margin:0;font-weight:700}
+.phase-head .range{font-size:12.5px;color:var(--accent);font-weight:500}
+.phase-head .count{margin-left:auto;font-size:12.5px;color:var(--muted)}
+.tasks{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.task{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:4px 12px;padding:12px 14px;border-top:1px solid var(--line);align-items:start}
+.task:first-child{border-top:0}
+.task input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--accent);cursor:pointer}
+.task input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.task label{font-weight:600;cursor:pointer;line-height:1.4}
+.task.is-done label{color:var(--faint);text-decoration:line-through;text-decoration-color:var(--faint)}
+.chip{font-size:11.5px;white-space:nowrap;padding:2px 8px;border-radius:99px;background:var(--sunk);color:var(--muted);align-self:start;margin-top:1px}
+.chip[data-s="late"]{background:var(--late-soft);color:var(--late)}
+.chip[data-s="soon"]{background:var(--soon-soft);color:var(--soon)}
+.chip[data-s="done"]{background:var(--ok-soft);color:var(--ok)}
+.detail{grid-column:2 / 4;color:var(--muted);font-size:13.5px}
+.detail ul{margin:4px 0 0;padding-left:18px}
+.detail li{margin:2px 0}
+.detail b{color:var(--ink);font-weight:600}
+.task.is-done .detail{display:none}
+.task.is-done.open .detail{display:block}
+.meta{grid-column:2 / 4;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:2px}
+.src{font-size:11px;color:var(--faint);letter-spacing:.02em}
+.tag{font-size:11px;font-weight:600;padding:1px 7px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.tag.warn{background:var(--soon-soft);color:var(--soon)}
+.more{font:inherit;font-size:11.5px;border:0;background:none;color:var(--accent);cursor:pointer;padding:0}
+aside{display:grid;gap:14px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px)}
+@media (max-width:900px){aside{position:static}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.panel h3{margin:0 0 8px;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.panel.alert{border-color:var(--soon);background:var(--soon-soft)}
+.panel.alert h3{color:var(--soon)}
+dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:13px}
+dt{color:var(--muted)} dd{margin:0;font-weight:500;text-align:right}
+.weights{display:grid;gap:8px;font-size:13px}
+.w{display:grid;grid-template-columns:1fr auto;gap:3px 10px}
+.w .bar{grid-column:1 / 3;height:6px}
+.panel p{margin:0 0 6px;font-size:13px}
+.panel p:last-child{margin-bottom:0}
+.contacts{display:grid;gap:8px;font-size:13px}
+.contacts div span{display:block;color:var(--muted);font-size:12px;word-break:break-word}
+.empty{padding:14px;color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.btn{font:inherit;font-size:13px;font-weight:500;padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.save[data-s="error"]::before{background:var(--late)}
+.modal{position:fixed;inset:0;background:rgb(0 0 0/.45);display:grid;place-items:center;padding:20px;z-index:20}
+.modal-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;max-width:560px;width:100%;display:grid;gap:8px;max-height:90vh;overflow:auto}
+.modal-card h2{margin:0;font-size:18px}
+.modal-card p{margin:0;color:var(--muted);font-size:13px}
+.modal-card label{font-size:12px;font-weight:600;color:var(--muted)}
+.modal-card input#cfg-url,.modal-card input#cfg-key{width:100%;font:inherit;font-size:13px;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--ground);color:var(--ink)}
+#cfg-msg{padding:10px 12px;border-radius:8px;background:var(--sunk);line-height:1.5}
+#cfg-msg[data-kind="bad"]{background:var(--late-soft);color:var(--late)}
+#cfg-msg[data-kind="ok"]{background:var(--ok-soft);color:var(--ok)}
+.modal-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.hint{font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap" id="root"></div>
+
+<script type="application/json" id="saved-state">{"done":[]}</script>
+
+<script id="app-script">
+(function(){
+const TODAY = (()=>{const d=new Date();d.setHours(0,0,0,0);return d})();
+const P = (s)=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const fmt = (s)=>{const d=P(s);return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()};
+const SRC = {bosch:'Email offer Bosch', jd:'JD Bosch', reg:'ECE Registration Process', form:'ECE Registration Form', guide:'ECE Internship Guidelines', monthly:'Guideline báo cáo tháng', final:'Guideline báo cáo cuối', done:'ECE Completion Process', tip:'Gợi ý thêm'};
+
+const PHASES = [
+{id:'A', name:'Làm ngay', range:'15 – 16/09/2026', start:'2026-09-15', end:'2026-09-16', tasks:[
+ {id:'a1', due:'2026-09-16', label:'11:11 sáng 16/09', t:'Trả lời email Bosch để xác nhận nhận offer', d:'Reply thẳng vào email offer, <b>trước 11:11 sáng Thứ Tư 16/09/2026</b>. Tiện hỏi luôn HR: bạn làm ở văn phòng TP.HCM hay Hà Nội (để biết có cần gửi ảnh thẻ không).', s:['bosch']},
+ {id:'a2', due:'2026-09-15', t:'Gửi yêu cầu xin thư giới thiệu từ VGU', d:'Hạn nộp bản mềm cho Bosch chỉ còn 3 ngày — gửi yêu cầu ngay cho ECE Office (ece_program@vgu.edu.vn). Thư bắt buộc có:<ul><li>Họ tên, ngày sinh, mã sinh viên, số CCCD</li><li>Tên trường: Vietnamese-German University</li><li>Thời gian thực tập: 02/10/2026 – 25/03/2027</li><li>Chữ ký đại diện trường + dấu chính thức</li><li>Ngày cấp thư phải <b>trước</b> ngày bắt đầu thực tập</li></ul>', s:['bosch','jd']},
+ {id:'a3', due:'2026-09-16', t:'Kiểm tra đủ điều kiện đăng ký môn Internship', d:'Cần <b>≥ 120 ECTS</b>, không tính các môn tiếng Đức — xem trên SIS. Nếu thiếu, AC/EB sẽ xét từng trường hợp.', s:['reg','guide']},
+ {id:'a4', due:'2026-09-18', t:'Tìm giảng viên hướng dẫn (GVHD) ở VGU', d:'Là giảng viên hoặc kỹ sư lab. Nếu không tìm được, báo ECE Office để được phân công. Cần chữ ký GVHD trước khi nộp form đăng ký.', s:['reg','guide']},
+ {id:'a5', label:'Nếu làm ở Hà Nội', opt:true, t:'Gửi ảnh chân dung làm thẻ ra vào', d:'Chỉ áp dụng cho văn phòng Hà Nội. JD ghi địa điểm 364 Cộng Hòa, Tân Bình, TP.HCM nên nhiều khả năng bạn <b>không</b> cần bước này. Nếu cần: ảnh kiểu hộ chiếu, nền trắng (có thể dùng remove.bg), tên file <b>Intern_Hoang Minh Khoa</b>, gửi bằng cách reply email offer.', s:['bosch','jd']},
+]},
+{id:'B', name:'Nộp thư giới thiệu cho Bosch', range:'Hạn 18/09/2026', start:'2026-09-17', end:'2026-09-18', tasks:[
+ {id:'b1', due:'2026-09-18', t:'Gửi bản mềm (scan PDF) thư giới thiệu cho Bosch', d:'Hạn <b>Thứ Sáu 18/09/2026</b>. Kiểm tra lại đủ các nội dung bắt buộc ở trên trước khi gửi. Nộp trễ có thể bị lùi ngày bắt đầu hoặc ảnh hưởng đến suất thực tập.', s:['bosch']},
+ {id:'b2', due:'2026-10-02', t:'Giữ bản cứng (bản gốc có dấu) để nộp ngày đầu tiên', d:'Để chung với giấy tờ mang theo ngày 02/10.', s:['bosch']},
+]},
+{id:'C', name:'Đăng ký môn 61ECE401 với VGU', range:'15/09 – 01/10/2026', start:'2026-09-15', end:'2026-10-01', tasks:[
+ {id:'c1', due:'2026-09-22', t:'Điền Internship Registration Form', d:'<ul><li>Họ tên, số CCCD, ngày sinh, nơi sinh</li><li>Công ty: Bosch Global Software Technologies Company Limited (BGSV)</li><li>Địa chỉ: 364 Cộng Hòa, Tân Bình, TP.HCM</li><li>Vị trí: Intern – Embedded Developer Intern (phòng MS/EDA-XC)</li><li>Thông tin supervisor công ty: tên, chức vụ, phòng ban, SĐT, email (chưa biết thì bổ sung ở tuần đầu)</li><li>Thời gian: 6 tháng, từ 02/10/2026 đến 25/03/2027</li><li>Ngày đăng ký + chữ ký sinh viên</li></ul>', s:['form']},
+ {id:'c2', due:'2026-09-23', t:'Xin chữ ký GVHD VGU (Supervisor 1) trên form', d:'Form phải có ít nhất một chữ ký của GVHD VGU trước khi nộp.', s:['reg']},
+ {id:'c3', due:'2026-09-25', t:'Nộp hồ sơ qua Google Form của ECE Office', d:'Upload PDF: <b>registration form</b> đã có chữ ký GVHD + <b>email offer</b> của Bosch. Chưa có link Google Form thì hỏi ECE Office.', s:['reg']},
+ {id:'c4', due:'2026-10-01', t:'Nhận email phê duyệt từ ECE Office', d:'ECE Office kiểm tra → Academic Coordinator duyệt → email cho bạn và GVHD. Form ghi rằng thực tập chỉ được tính từ khi được phê duyệt, nên cố có email này trước 02/10. Đến ~28/09 chưa thấy thì hỏi lại ECE Office.', s:['reg','form']},
+ {id:'c5', label:'Cả kỳ', t:'Không đăng ký môn học nào khác trong kỳ thực tập', d:'Chỉ được dự thi lại (nếu có).', s:['guide']},
+]},
+{id:'D', name:'Pre-boarding trên Bosch Portal', range:'~22/09 – 01/10/2026', start:'2026-09-21', end:'2026-10-01', tasks:[
+ {id:'d1', due:'2026-09-23', label:'~22–23/09', t:'Theo dõi email mời vào Bosch Pre-boarding Portal', d:'Email đến khoảng 7–8 ngày làm việc trước 02/10, kèm file <b>Pre-boarding Portal User Guide</b>. Kiểm tra cả Spam. Đến 24/09 chưa nhận được thì email HR.', s:['bosch']},
+ {id:'d2', due:'2026-10-01', t:'Đăng ký tài khoản và thiết lập xác thực', d:'Làm theo User Guide.', s:['bosch']},
+ {id:'d3', due:'2026-10-01', t:'Khai báo thông tin cá nhân', s:['bosch']},
+ {id:'d4', due:'2026-10-01', t:'Upload Digital ID Card và các giấy tờ khác', d:'Chuẩn bị sẵn bản scan CCCD / Digital ID và các giấy tờ User Guide yêu cầu.', s:['bosch']},
+ {id:'d5', due:'2026-10-01', t:'Hoàn thành mọi mục onboarding còn lại', d:'Tất cả phải xong <b>trước ngày 02/10</b>. Gặp lỗi thì liên hệ HR đã gửi offer.', s:['bosch']},
+ {id:'d6', due:'2026-10-01', t:'Chuẩn bị cho ngày đầu tiên', d:'Bản cứng thư giới thiệu, CCCD; xác nhận giờ có mặt và địa điểm với HR; tìm đường và chỗ gửi xe.', s:['bosch','tip']},
+]},
+{id:'E', name:'Tuần đầu tiên', range:'02/10 – 09/10/2026', start:'2026-10-02', end:'2026-10-09', tasks:[
+ {id:'e1', due:'2026-10-02', t:'Nộp bản cứng thư giới thiệu cho Bosch', s:['bosch','jd']},
+ {id:'e2', due:'2026-10-02', t:'Gặp HR và supervisor Bosch, xác nhận các điều kiện trước khi ký', d:'Giờ làm, nhiệm vụ, nội quy, an toàn lao động. Đối chiếu với offer: trợ cấp 4.250.000đ gross/tháng; ăn trưa 60.000đ gross/ngày thực làm; gửi xe 200.000đ gross/tháng; bảo hiểm tai nạn Bảo Việt; nghỉ phép 1 ngày + 1 ngày ốm (cần giấy bác sĩ) mỗi tháng, thêm ngày nghỉ sinh nhật nếu sinh nhật rơi vào kỳ thực tập.', s:['guide','bosch']},
+ {id:'e3', due:'2026-10-02', t:'Ký Internship Agreement; đọc kỹ Internship Policy và quy định bảo mật', s:['guide','bosch']},
+ {id:'e4', due:'2026-10-09', t:'Xin chữ ký supervisor Bosch (Supervisor 2) trên Registration Form', d:'Sau đó mở lại câu trả lời Google Form đã nộp và <b>cập nhật bản form có đủ chữ ký</b>. Bổ sung thông tin supervisor nếu lúc trước còn trống.', s:['reg']},
+ {id:'e5', due:'2026-10-09', t:'Hỏi supervisor Bosch: được đưa những gì vào báo cáo gửi VGU?', d:'Mọi thông tin có được từ Bosch đều là bảo mật, tiết lộ cần Bosch đồng ý bằng văn bản. Thống nhất sớm phạm vi nội dung/ảnh dùng cho báo cáo tháng, báo cáo cuối và buổi thuyết trình.', s:['bosch','tip'], warn:true},
+ {id:'e6', due:'2026-10-02', t:'Bắt đầu ghi timesheet hằng ngày', d:'Ghi giờ vào/ra và ngày nghỉ. Đây là bằng chứng đủ 900 AHs và là dữ liệu cho báo cáo.', s:['guide','tip']},
+ {id:'e7', due:'2026-10-09', t:'Chốt lịch nộp báo cáo tháng với GVHD VGU', d:'Hạn nộp tùy lịch thực tập, nên hỏi rõ: hạn cụ thể mỗi tháng, nộp qua email hay bản in, có họp định kỳ không.', s:['guide']},
+]},
+{id:'F', name:'Trong kỳ thực tập', range:'10/2026 – 03/2027', start:'2026-10-10', end:'2027-03-10', note:'Mỗi báo cáo tháng: viết (phần thân 5–15 trang) → supervisor Bosch ký trang Confirmation → nộp GVHD. Hạn dưới đây là gợi ý, lấy theo hạn GVHD chốt.', tasks:[
+ {id:'f1', due:'2026-11-06', label:'Gợi ý ~06/11', t:'Báo cáo tháng 1 (02/10 – 31/10/2026)', s:['monthly','guide']},
+ {id:'f2', due:'2026-12-04', label:'Gợi ý ~04/12', t:'Báo cáo tháng 2 (11/2026)', s:['monthly']},
+ {id:'f3', due:'2027-01-08', label:'Gợi ý ~08/01', t:'Báo cáo tháng 3 (12/2026)', s:['monthly']},
+ {id:'f4', due:'2027-02-03', label:'Gợi ý ~03/02', t:'Báo cáo tháng 4 (01/2027)', d:'Tết Đinh Mùi rơi vào 06/02/2027 — nên nộp trước kỳ nghỉ Tết.', s:['monthly','tip']},
+ {id:'f5', due:'2027-03-05', label:'Gợi ý ~05/03', t:'Báo cáo tháng 5 (02/2027)', s:['monthly']},
+ {id:'f6', due:'2027-03-31', label:'Hỏi GVHD', t:'Báo cáo tháng 6 (01/03 – 25/03/2027)', d:'Hỏi GVHD có cần nộp riêng hay gộp vào báo cáo cuối.', s:['monthly']},
+ {id:'f7', label:'Mỗi báo cáo', t:'Kiểm tra định dạng báo cáo tháng', d:'<ul><li>Thứ tự: bìa → Confirmation (Bosch ký) → mục lục → danh mục hình → danh mục bảng → thân bài → phụ lục → tài liệu tham khảo</li><li>Thân bài gồm 5 phần: Introduction · Description of main duties · Analysis of your tasks · Conclusions & Recommendations · Kế hoạch các tháng tới</li><li>Times New Roman hoặc Arial cỡ 13, giãn dòng 1.5; lề trái 3 cm, các lề khác 2 cm</li><li>Bìa không đánh số; mục lục/danh mục đánh số La Mã; thân bài trở đi đánh số 1, 2, 3</li></ul>Sai định dạng sẽ bị trừ điểm. Báo cáo tháng chiếm 20% điểm.', s:['monthly']},
+ {id:'f8', label:'Hằng tháng', t:'Cập nhật tiến độ định kỳ cho GVHD VGU', s:['guide']},
+ {id:'f9', label:'Cả kỳ', t:'Theo dõi số giờ làm và cân nhắc khi xin nghỉ', d:'Xem ô “Số giờ thực tập” bên cạnh — tổng giờ khá sát ngưỡng 900 AHs.', s:['guide','tip'], warn:true},
+ {id:'f10', due:'2027-01-15', t:'Bắt đầu dựng khung Final Report', d:'Gom dần: ảnh/minh họa được phép dùng, số liệu đóng góp (số dòng code, số module, số cuộc họp…), sơ đồ tổ chức kèm vị trí của bạn, Gantt chart các công việc.', s:['final','tip']},
+]},
+{id:'G', name:'Hai tuần cuối', range:'11/03 – 25/03/2027', start:'2027-03-11', end:'2027-03-25', tasks:[
+ {id:'g1', due:'2027-03-11', t:'Báo ngày làm việc cuối (25/03/2027) và hoàn tất các task được giao', s:['guide']},
+ {id:'g2', due:'2027-03-25', t:'Xin Internship Certificate', d:'Theo mẫu của VGU: thông tin công ty (tên, địa chỉ, SĐT, email); thông tin của bạn (họ tên, ngày sinh, MSSV, địa chỉ); ngày bắt đầu–kết thúc và tổng thời lượng; đại diện công ty ký. Đưa mẫu cho HR sớm.', s:['final','guide']},
+ {id:'g3', due:'2027-03-25', t:'Xin Intern Evaluation Form (for the Industry)', d:'Supervisor chấm 10 tiêu chí (0–100), trả lời 4 câu nhận xét, ký và ghi ngày. Chiếm <b>30%</b> điểm.', s:['final','guide']},
+ {id:'g4', due:'2027-03-25', t:'Xin xác nhận số giờ làm / timesheet', d:'Dùng để chứng minh đủ 900 AHs, vì tổng thời gian 02/10 – 25/03 ngắn hơn 6 tháng một chút.', s:['reg','guide']},
+ {id:'g5', due:'2027-03-25', t:'Supervisor Bosch duyệt Final Report và ký trang Confirmation', s:['final','guide']},
+ {id:'g6', due:'2027-03-25', t:'Scan và lưu mọi giấy tờ trước khi đóng vào báo cáo', d:'Certificate, evaluation form, xác nhận timesheet…', s:['done']},
+ {id:'g7', due:'2027-03-25', t:'Gửi lời cảm ơn đến công ty và đồng nghiệp', s:['guide']},
+ {id:'g8', due:'2027-03-25', opt:true, t:'Hỏi HR về thủ tục kết thúc thực tập', d:'Tài liệu không nói rõ; thường gồm bàn giao công việc, trả thẻ và thiết bị.', s:['tip']},
+]},
+{id:'H', name:'Final Report và thuyết trình', range:'26/03 – 25/05/2027', start:'2027-03-26', end:'2027-05-25', tasks:[
+ {id:'h1', due:'2027-04-10', t:'Hoàn thiện Final Report đúng thứ tự 13 phần', d:'<ul><li>Bìa · Confirmation · bản sao Internship Certificate · Evaluation form của công ty · Evaluation form của trường · Acknowledgments · Non-plagiarism declaration · mục lục · danh mục hình · danh mục bảng · thân bài · phụ lục · tài liệu tham khảo</li><li>Thân bài 30–50 trang: Introduction (5–10) · Description of activities (10–15) · Analysis (15–20, trả lời đủ 7 câu hỏi i–vii) · Conclusions & Recommendations (1–3)</li><li>Introduction phải có sơ đồ tổ chức, vị trí của bạn và Gantt chart</li></ul>', s:['final','guide']},
+ {id:'h2', due:'2027-04-10', t:'Kiểm tra định dạng Final Report', d:'Times New Roman/Arial 13, giãn dòng 1.5; lề trái 3 cm, còn lại 2 cm; đánh số La Mã cho mục lục/danh mục, số thường từ thân bài. Phải là bài của chính bạn — đạo văn sẽ bị trượt.', s:['final','guide']},
+ {id:'h3', due:'2027-04-10', t:'Ký Non-plagiarism Declaration Form', s:['final']},
+ {id:'h4', due:'2027-04-20', t:'GVHD VGU duyệt Final Report', s:['guide']},
+ {id:'h5', due:'2027-04-03', t:'Hẹn ngày thuyết trình với GVHD', d:'GVHD sẽ liên hệ ECE Office đặt phòng nếu cần.', s:['done']},
+ {id:'h6', due:'2027-05-15', t:'Chuẩn bị slide và demo/video', d:'Tiêu chí chấm: bố cục và độ dễ đọc của slide, cách trình bày, đúng giờ, nội dung bám mục tiêu, nắm vững chủ đề, video/minh họa, trả lời câu hỏi. Final report + thuyết trình chiếm <b>50%</b> điểm.', s:['final','guide']},
+ {id:'h7', due:'2027-05-15', t:'In bản cứng Final Report', d:'Giấy sạch, không tẩy xóa.', s:['final','done']},
+ {id:'h8', due:'2027-05-25', label:'Muộn nhất 25/05', t:'Thuyết trình với GVHD', d:'Hạn chót là trong vòng 2 tháng kể từ ngày kết thúc thực tập, tức <b>25/05/2027</b>.', s:['done']},
+ {id:'h9', due:'2027-05-29', t:'Xác nhận GVHD đã gửi bản cứng báo cáo và điểm cho ECE Office', s:['done']},
+ {id:'h10', due:'2027-06-15', label:'Sau khi nộp điểm', t:'Kiểm tra điểm môn Internship trên SIS', s:['done']},
+]},
+];
+
+// ---- state ----
+let done = new Set();
+try{ done = new Set(JSON.parse(document.getElementById('saved-state').textContent).done||[]); }catch(e){}
+let filter = 'all';
+try{ filter = localStorage.getItem('bosch-intern-filter') || 'all'; }catch(e){}
+const openDone = new Set();
+
+const all = PHASES.flatMap(p=>p.tasks.map(t=>({...t, phase:p})));
+const req = all.filter(t=>!t.opt);
+
+function chipFor(t){
+  if(done.has(t.id)) return {s:'done', txt:'Xong'};
+  if(!t.due) return {s:'', txt:t.label||''};
+  const days = Math.round((P(t.due)-TODAY)/864e5);
+  const base = t.label || fmt(t.due);
+  if(days<0) return {s:'late', txt:'Quá hạn · '+base};
+  if(days<=3) return {s:'soon', txt:(days===0?'Hôm nay':days===1?'Ngày mai':'Còn '+days+' ngày')+(t.label?' · '+t.label:' · '+fmt(t.due))};
+  return {s:'', txt:base};
+}
+const esc = (s)=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function render(){
+  const nDone = req.filter(t=>done.has(t.id)).length;
+  const pct = Math.round(nDone/req.length*100);
+  const upcoming = all.filter(t=>!done.has(t.id) && t.due && !t.opt).sort((a,b)=>P(a.due)-P(b.due));
+  const nx = upcoming[0];
+  const late = upcoming.filter(t=>P(t.due)<TODAY).length;
+  const daysToStart = Math.round((P('2026-10-02')-TODAY)/864e5);
+  const startTxt = daysToStart>0 ? daysToStart+' ngày' : (daysToStart===0?'Hôm nay':'Đã bắt đầu');
+
+  let h = `<header class="top">
+    <div><div class="eyebrow">Hoàng Minh Khoa · VGU ECE · Module 61ECE401</div>
+    <h1>Lộ trình thực tập Embedded Developer tại Bosch</h1>
+    <p class="sub">Mọi việc cần làm từ hôm nay đến khi có điểm, tổng hợp từ email offer, JD và bộ tài liệu thực tập của ECE. Tick vào ô khi xong — tiến độ được lưu lại.</p></div>
+    <div class="status">
+      <div class="stat"><span class="k">Tiến độ</span><span class="v mono">${nDone}/${req.length}</span><div class="bar"><i style="width:${pct}%"></i></div></div>
+      <div class="stat"><span class="k">Việc gần nhất</span>${nx?`<span class="next-title">${esc(nx.t)}</span><span><span class="chip" data-s="${chipFor(nx).s}">${esc(chipFor(nx).txt)}</span></span>`:'<span class="next-title">Đã xong tất cả</span>'}</div>
+      <div class="stat"><span class="k">Đến ngày bắt đầu (02/10)</span><span class="v mono">${startTxt}</span>${late?`<span class="chip" data-s="late" style="justify-self:start">${late} việc quá hạn</span>`:''}</div>
+    </div></header>
+    <div class="toolbar"><div class="seg" role="group" aria-label="Lọc">
+      <button id="f-all" aria-pressed="${filter==='all'}" data-f="all">Tất cả</button>
+      <button id="f-open" aria-pressed="${filter==='open'}" data-f="open">Chưa xong</button></div>
+      <span class="save" id="save-state" data-s="${saveState}">${saveText[saveState]}</span></div>
+    <div class="layout"><main>`;
+
+  for(const p of PHASES){
+    const pr = p.tasks.filter(t=>!t.opt);
+    const pd = pr.filter(t=>done.has(t.id)).length;
+    const state = pd===pr.length ? 'done' : (TODAY>=P(p.start) && TODAY<=P(p.end)) || (TODAY>P(p.end)) ? 'now' : '';
+    const shown = p.tasks.filter(t=>filter==='all' || !done.has(t.id));
+    h += `<section class="phase" data-state="${state}"><span class="node"></span>
+      <div class="phase-head"><h2>${esc(p.name)}</h2><span class="range mono">${esc(p.range)}</span><span class="count">${pd}/${pr.length} xong</span></div>
+      ${p.note?`<p class="sub" style="margin:0 0 10px;font-size:13.5px">${esc(p.note)}</p>`:''}
+      <div class="tasks">`;
+    if(!shown.length) h += `<div class="empty">Đã xong hết giai đoạn này.</div>`;
+    for(const t of shown){
+      const c = chipFor(t), isD = done.has(t.id);
+      h += `<div class="task${isD?' is-done':''}${openDone.has(t.id)?' open':''}">
+        <input type="checkbox" id="cb-${t.id}" data-id="${t.id}" ${isD?'checked':''}>
+        <label for="cb-${t.id}">${esc(t.t)}</label>
+        ${c.txt?`<span class="chip mono" data-s="${c.s}">${esc(c.txt)}</span>`:'<span></span>'}
+        ${t.d?`<div class="detail">${t.d}</div>`:''}
+        <div class="meta">${t.opt?'<span class="tag">Tùy trường hợp</span>':''}${t.warn?'<span class="tag warn">Lưu ý</span>':''}<span class="src">Nguồn: ${t.s.map(k=>SRC[k]).join(' · ')}</span>${isD&&t.d?` <button class="more" data-more="${t.id}">${openDone.has(t.id)?'Ẩn chi tiết':'Xem chi tiết'}</button>`:''}</div>
+      </div>`;
+    }
+    h += `</div></section>`;
+  }
+
+  h += `</main><aside>
+    <div class="panel"><h3>Offer</h3><dl>
+      <dt>Vị trí</dt><dd>Embedded Developer Intern</dd>
+      <dt>Phòng</dt><dd>MS/EDA-XC</dd>
+      <dt>Thời gian</dt><dd class="mono">02/10/26 – 25/03/27</dd>
+      <dt>Trợ cấp</dt><dd class="mono">4.250.000đ/tháng</dd>
+      <dt>Ăn trưa</dt><dd class="mono">60.000đ/ngày</dd>
+      <dt>Gửi xe</dt><dd class="mono">200.000đ/tháng</dd>
+      <dt>Nghỉ phép</dt><dd>1 phép + 1 ốm/tháng</dd>
+      <dt>Bảo hiểm</dt><dd>Tai nạn – Bảo Việt</dd>
+    </dl><p style="margin-top:8px;color:var(--muted);font-size:12px">Các khoản là gross, đã gồm thuế TNCN.</p></div>
+
+    <div class="panel alert"><h3>Số giờ thực tập</h3>
+      <p>ECE yêu cầu tối thiểu <b>900 AHs</b>. Từ 02/10/2026 đến 25/03/2027 có <b class="mono">125</b> ngày thường; trừ 01/01 và khoảng 5 ngày nghỉ Tết (ước tính) còn <b class="mono">~119</b> ngày ≈ <b class="mono">952 giờ</b> nếu làm 8 giờ/ngày.</p>
+      <p>Nếu dùng hết 6 ngày phép thì còn khoảng <b class="mono">904 giờ</b> — rất sát ngưỡng. Tài liệu không nói 1 AH bằng bao nhiêu phút, nên hỏi ECE Office và ghi timesheet đầy đủ.</p></div>
+
+    <div class="panel"><h3>Cách tính điểm</h3><div class="weights">
+      <div class="w"><span>Báo cáo tháng</span><span class="mono">20%</span><div class="bar"><i style="width:20%"></i></div></div>
+      <div class="w"><span>Đánh giá của công ty</span><span class="mono">30%</span><div class="bar"><i style="width:30%"></i></div></div>
+      <div class="w"><span>Final report + thuyết trình</span><span class="mono">50%</span><div class="bar"><i style="width:50%"></i></div></div>
+    </div></div>
+
+    <div class="panel"><h3>Liên hệ</h3><div class="contacts">
+      <div>ECE Office — Ms. Nguyễn Thị Hoài Linh<span>ece_program@vgu.edu.vn · Room 320, Academic Cluster 3</span></div>
+      <div>Academic Coordinator — Assoc. Prof. Dr. Thái Truyền Đại Chấn<span>chan.ttd@vgu.edu.vn · Room 319, Academic Cluster 3</span></div>
+      <div>VGU Career Services<span>careerservices@vgu.edu.vn · Room 218, Admin Building</span></div>
+      <div>Bosch HR<span>Reply vào email offer</span></div>
+    </div></div>
+  </aside></div>`;
+  document.getElementById('root').innerHTML = h;
+}
+// ---- lưu tiến độ: localStorage + Supabase (tùy chọn) ----
+var saveState = 'local';
+var saveText = {local:'Lưu trên máy này', saving:'Đang lưu…', saved:'Đã đồng bộ', error:'Lỗi đồng bộ · bấm để xem', idle:'Lưu trên máy này'};
+var CFG_KEY = 'bosch-intern-supabase', DONE_KEY = 'bosch-intern-done';
+var cfg = null, lastError = '';
+try { cfg = JSON.parse(localStorage.getItem(CFG_KEY) || 'null'); } catch(e){}
+
+function setSave(s, err){
+  saveState = s; if(s === 'error' && err) lastError = err;
+  var el = document.getElementById('save-state');
+  if(el){ el.dataset.s = s; el.textContent = saveText[s]; el.style.cursor = s === 'error' ? 'pointer' : ''; el.onclick = s === 'error' ? openCfg : null; }
+}
+function saveLocal(){ try{ localStorage.setItem(DONE_KEY, JSON.stringify([...done])); }catch(e){} }
+function baseUrl(u){ return String(u||'').trim().replace(/\/+$/,'').replace(/\/rest\/v1$/,''); }
+
+function api(path, opts){
+  opts = opts || {};
+  return fetch(baseUrl(cfg.url) + '/rest/v1/' + path, {
+    method: opts.method || 'GET',
+    headers: Object.assign({'apikey': cfg.key, 'Authorization': 'Bearer ' + cfg.key, 'Content-Type': 'application/json'}, opts.headers || {}),
+    body: opts.body ? JSON.stringify(opts.body) : undefined
+  }).then(async r => {
+    if(!r.ok){ var txt = await r.text(); var e = new Error(txt || ('HTTP ' + r.status)); e.status = r.status; throw e; }
+    return r.status === 204 ? null : r.json();
+  });
+}
+
+// Dịch lỗi kỹ thuật sang tiếng người
+function explain(err){
+  var s = err && err.status, t = (err && err.message) || String(err);
+  if(!s && /Failed to fetch|NetworkError|Load failed/i.test(t)){
+    return location.protocol === 'file:'
+      ? 'Không gọi được Supabase. Bạn đang mở file trực tiếp (file://) — nhiều trình duyệt chặn kiểu này. Cách sửa: đưa index.html lên GitHub Pages rồi mở bằng https, hoặc kiểm tra mạng / project Supabase có đang bị paused không.'
+      : 'Không gọi được Supabase: kiểm tra mạng, Project URL có đúng dạng https://xxxx.supabase.co không, và project có bị paused trong dashboard không (free plan tự dừng sau ~1 tuần không dùng, bấm Restore là chạy lại).';
+  }
+  if(s === 404 || /does not exist|PGRST205|Could not find the table/i.test(t))
+    return 'Chưa có bảng internship_progress. Vào Supabase → SQL Editor → New query → dán toàn bộ file supabase-setup.sql → Run, rồi thử lại.';
+  if(s === 401)
+    return 'Key không hợp lệ. Vào Project Settings → API, copy lại key "anon public" (hoặc "publishable"), dán đủ cả chuỗi, không thừa dấu cách.';
+  if(s === 403 || /42501|row-level security|permission denied/i.test(t))
+    return 'Key đúng nhưng bảng chặn quyền ghi (RLS). Chạy lại phần "create policy" trong supabase-setup.sql, rồi thử lại.';
+  if(s === 409 || /23505/.test(t))
+    return 'Trùng khóa khi ghi. Thử tải lại trang rồi tick lại một lần.';
+  if(s === 503 || s === 502 || s === 504)
+    return 'Supabase đang không phản hồi (có thể project bị paused). Mở dashboard Supabase, bấm Restore project, rồi thử lại.';
+  return 'Lỗi ' + (s || '') + ': ' + t.slice(0, 300);
+}
+
+function push(ids){
+  if(!cfg || !ids.length) return Promise.resolve();
+  var now = new Date().toISOString();
+  var body = ids.map(id => ({task_id: id, done: done.has(id), updated_at: now}));
+  setSave('saving');
+  return api('internship_progress', {method:'POST', body: body, headers:{'Prefer':'resolution=merge-duplicates'}})
+    .then(()=>setSave('saved')).catch(err=>{ console.warn(err); setSave('error', explain(err)); });
+}
+
+function pull(){
+  if(!cfg) return Promise.resolve();
+  setSave('saving');
+  return api('internship_progress?select=task_id,done').then(rows => {
+    var remote = new Set(rows.filter(r=>r.done).map(r=>r.task_id));
+    var localOnly = [...done].filter(id => !remote.has(id));
+    localOnly.forEach(id => remote.add(id));
+    done = remote; saveLocal(); render(); setSave('saved');
+    if(localOnly.length) push(localOnly);
+  }).catch(err => { console.warn(err); setSave('error', explain(err)); });
+}
+
+var _render = render;
+render = function(){
+  _render();
+  var tb = document.querySelector('.toolbar');
+  if(tb && !tb.querySelector('.cfg-btn')){
+    var b = document.createElement('button');
+    b.className = 'btn cfg-btn'; b.type = 'button';
+    b.textContent = cfg ? 'Đồng bộ: đang bật' : 'Bật đồng bộ nhiều máy';
+    b.onclick = openCfg; tb.insertBefore(b, tb.lastElementChild);
+  }
+  if(saveState === 'error') setSave('error');
+};
+
+function openCfg(){
+  var d = document.getElementById('cfg-dialog');
+  d.querySelector('#cfg-url').value = cfg ? cfg.url : '';
+  d.querySelector('#cfg-key').value = cfg ? cfg.key : '';
+  say(lastError || '', lastError ? 'bad' : '');
+  d.hidden = false;
+}
+function say(msg, kind){
+  var el = document.getElementById('cfg-msg');
+  if(!el) return;
+  el.textContent = msg || ''; el.hidden = !msg; el.dataset.kind = kind || '';
+}
+
+function check(){
+  var url = baseUrl(document.getElementById('cfg-url').value);
+  var key = document.getElementById('cfg-key').value.trim();
+  if(!url || !key) return say('Chưa điền đủ Project URL và key.', 'bad');
+  if(!/^https:\/\//i.test(url)) return say('Project URL phải bắt đầu bằng https:// và có dạng https://xxxx.supabase.co', 'bad');
+  if(/^sb_secret_|service_role/i.test(key)) return say('Đây là key bí mật (service_role / secret). Dùng key "anon public" hoặc "publishable" thay vào — key bí mật không được dán vào trang web.', 'bad');
+  say('Đang kiểm tra…', '');
+  var saved = cfg; cfg = {url: url, key: key};
+  api('internship_progress?select=task_id&limit=1')
+    .then(()=>{ say('Kết nối tốt. Bấm "Lưu và đồng bộ" để bật.', 'ok'); cfg = saved; })
+    .catch(err => { console.warn(err); say(explain(err), 'bad'); cfg = saved; });
+}
+
+function buildDialog(){
+  var d = document.createElement('div');
+  d.id = 'cfg-dialog'; d.hidden = true; d.className = 'modal';
+  d.innerHTML = '<div class="modal-card"><h2>Đồng bộ nhiều thiết bị</h2>'
+    + '<p>Dán Project URL và anon public key của Supabase (xem README). Để trống nếu chỉ muốn lưu trên máy này.</p>'
+    + '<label for="cfg-url">Project URL</label><input id="cfg-url" placeholder="https://xxxx.supabase.co" autocomplete="off" spellcheck="false">'
+    + '<label for="cfg-key">Anon public key</label><input id="cfg-key" placeholder="eyJhbGciOi... hoặc sb_publishable_..." autocomplete="off" spellcheck="false">'
+    + '<p id="cfg-msg" hidden></p>'
+    + '<div class="modal-row"><button class="btn primary" id="cfg-save" type="button">Lưu và đồng bộ</button>'
+    + '<button class="btn" id="cfg-check" type="button">Kiểm tra kết nối</button>'
+    + '<button class="btn" id="cfg-clear" type="button">Tắt đồng bộ</button>'
+    + '<button class="btn" id="cfg-export" type="button">Xuất file JSON</button>'
+    + '<label class="btn" for="cfg-import">Nhập file JSON</label><input type="file" id="cfg-import" accept="application/json" hidden>'
+    + '<button class="btn" id="cfg-close" type="button">Đóng</button></div>'
+    + '<p class="hint">Tiến độ luôn được lưu trên máy này kể cả khi đồng bộ lỗi — không mất gì. Key anon là public, chỉ chạm được bảng tiến độ; đừng dán service_role key.</p></div>';
+  document.body.appendChild(d);
+  d.addEventListener('click', e => { if(e.target === d) d.hidden = true; });
+  d.querySelector('#cfg-close').onclick = ()=> d.hidden = true;
+  d.querySelector('#cfg-check').onclick = check;
+  d.querySelector('#cfg-save').onclick = ()=>{
+    var url = baseUrl(d.querySelector('#cfg-url').value), key = d.querySelector('#cfg-key').value.trim();
+    if(!url || !key) return say('Chưa điền đủ Project URL và key.', 'bad');
+    cfg = {url: url, key: key};
+    try{ localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); }catch(e){}
+    lastError = ''; render(); pull().then(()=>{ if(saveState === 'error') say(lastError, 'bad'); else d.hidden = true; });
+  };
+  d.querySelector('#cfg-clear').onclick = ()=>{ cfg = null; lastError = ''; try{ localStorage.removeItem(CFG_KEY); }catch(e){} d.hidden = true; setSave('local'); render(); };
+  d.querySelector('#cfg-export').onclick = ()=>{
+    var blob = new Blob([JSON.stringify({done:[...done], exportedAt:new Date().toISOString()}, null, 2)], {type:'application/json'});
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'tien-do-thuc-tap.json'; a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+  };
+  d.querySelector('#cfg-import').onchange = e => {
+    var f = e.target.files[0]; if(!f) return;
+    f.text().then(txt => { var o = JSON.parse(txt); (o.done||[]).forEach(id => done.add(id)); saveLocal(); render(); if(cfg) push([...done]); d.hidden = true; })
+      .catch(()=>say('File JSON không đọc được.', 'bad'));
+  };
+}
+
+document.addEventListener('change', e => {
+  var cb = e.target.closest('input[data-id]'); if(!cb) return;
+  cb.checked ? done.add(cb.dataset.id) : done.delete(cb.dataset.id);
+  saveLocal(); render(); cfg ? push([cb.dataset.id]) : setSave('local');
+});
+document.addEventListener('click', e => {
+  var f = e.target.closest('[data-f]');
+  if(f){ filter = f.dataset.f; try{ localStorage.setItem('bosch-intern-filter', filter); }catch(_){} render(); return; }
+  var m = e.target.closest('[data-more]');
+  if(m){ var id = m.dataset.more; openDone.has(id) ? openDone.delete(id) : openDone.add(id); render(); }
+});
+
+try{ var ls = JSON.parse(localStorage.getItem(DONE_KEY) || '[]'); if(Array.isArray(ls)) ls.forEach(x => done.add(x)); }catch(e){}
+buildDialog();
+render();
+if(cfg){ pull(); setInterval(pull, 60000); window.addEventListener('focus', pull); }
+})();
+
+</script>
+</body>
+</html>
