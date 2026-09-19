@@ -118,7 +118,7 @@ dt{color:var(--muted)} dd{margin:0;font-weight:500;text-align:right}
 .modal-card p{margin:0;color:var(--muted);font-size:13px}
 .modal-card label{font-size:12px;font-weight:600;color:var(--muted)}
 .modal-card input#cfg-url,.modal-card input#cfg-key{width:100%;font:inherit;font-size:13px;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--ground);color:var(--ink)}
-#cfg-msg{padding:10px 12px;border-radius:8px;background:var(--sunk);line-height:1.5}
+#cfg-msg{padding:10px 12px;border-radius:8px;background:var(--sunk);line-height:1.5;word-break:break-word}
 #cfg-msg[data-kind="bad"]{background:var(--late-soft);color:var(--late)}
 #cfg-msg[data-kind="ok"]{background:var(--ok-soft);color:var(--ok)}
 .modal-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
@@ -321,7 +321,12 @@ function setSave(s, err){
   if(el){ el.dataset.s = s; el.textContent = saveText[s]; el.style.cursor = s === 'error' ? 'pointer' : ''; el.onclick = s === 'error' ? openCfg : null; }
 }
 function saveLocal(){ try{ localStorage.setItem(DONE_KEY, JSON.stringify([...done])); }catch(e){} }
-function baseUrl(u){ return String(u||'').trim().replace(/\/+$/,'').replace(/\/rest\/v1$/,''); }
+function baseUrl(u){
+  var s = String(u||'').trim();
+  var m = s.match(/supabase\.(?:com|co)\/dashboard\/project\/([a-z0-9]+)/i);
+  if(m) return 'https://' + m[1] + '.supabase.co';           // dán nhầm link dashboard -> tự đổi sang API URL
+  return s.replace(/\/+$/,'').replace(/\/rest\/v1$/,'');
+}
 
 function api(path, opts){
   opts = opts || {};
@@ -407,12 +412,12 @@ function check(){
   var url = baseUrl(document.getElementById('cfg-url').value);
   var key = document.getElementById('cfg-key').value.trim();
   if(!url || !key) return say('Chưa điền đủ Project URL và key.', 'bad');
-  if(!/^https:\/\//i.test(url)) return say('Project URL phải bắt đầu bằng https:// và có dạng https://xxxx.supabase.co', 'bad');
+  if(!/^https:\/\/[a-z0-9-]+\.supabase\.(co|in)/i.test(url)) return say('Project URL chưa đúng. Phải là https://<project-ref>.supabase.co lấy ở Project Settings → Data API, không phải link dashboard đang mở trên trình duyệt.', 'bad');
   if(/^sb_secret_|service_role/i.test(key)) return say('Đây là key bí mật (service_role / secret). Dùng key "anon public" hoặc "publishable" thay vào — key bí mật không được dán vào trang web.', 'bad');
   say('Đang kiểm tra…', '');
   var saved = cfg; cfg = {url: url, key: key};
   api('internship_progress?select=task_id&limit=1')
-    .then(()=>{ say('Kết nối tốt. Bấm "Lưu và đồng bộ" để bật.', 'ok'); cfg = saved; })
+    .then(()=>{ say('Kết nối tốt (' + url + '). Bấm "Lưu và đồng bộ" để bật.', 'ok'); cfg = saved; })
     .catch(err => { console.warn(err); say(explain(err), 'bad'); cfg = saved; });
 }
 
