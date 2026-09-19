@@ -108,6 +108,32 @@ dt{color:var(--muted)} dd{margin:0;font-weight:500;text-align:right}
 .empty{padding:14px;color:var(--muted);font-size:13px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
+.jump{color:var(--accent);font-weight:600}
+.guide{margin-top:40px}
+.guide-head h2{font-size:22px;margin:0 0 4px;font-weight:700}
+.guide-head p{color:var(--muted);margin:0 0 16px;max-width:70ch;font-size:14px}
+.guide-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px;align-items:start}
+.gcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;font-size:13.5px;line-height:1.6}
+.gcard.wide{grid-column:1/-1}
+.gcard h3{margin:0 0 8px;font-size:16px;font-weight:700}
+.gcard h4{margin:12px 0 4px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.gcard p{margin:0 0 8px}
+.gcard p:last-child{margin-bottom:0}
+.gcard ul,.gcard ol{margin:4px 0 8px;padding-left:20px}
+.gcard li{margin:3px 0}
+.gcard b{font-weight:600}
+.g-lead{color:var(--muted)}
+.gcard .bad,.gcard .good{padding:8px 10px;border-radius:8px;border-left:3px solid}
+.gcard .bad{background:var(--late-soft);border-color:var(--late)}
+.gcard .good{background:var(--ok-soft);border-color:var(--ok)}
+.gcard pre{background:var(--sunk);border-radius:8px;padding:12px 14px;overflow-x:auto;font:12.5px/1.55 ui-monospace,Consolas,monospace;margin:4px 0 10px}
+.gcard table{width:100%;border-collapse:collapse;font-size:12.5px;margin:6px 0;display:block;overflow-x:auto}
+.gcard th{text-align:left;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line)}
+.gcard td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.gcard .g-road td:first-child{white-space:nowrap;font-weight:600}
+.tagx{display:inline-block;font-size:10.5px;padding:1px 6px;border-radius:4px;background:var(--sunk);color:var(--faint);white-space:nowrap}
+.g-note{background:var(--accent-soft);color:var(--accent);padding:10px 12px;border-radius:8px}
+
 .btn{font:inherit;font-size:13px;font-weight:500;padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
 .btn:hover{border-color:var(--accent);color:var(--accent)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
@@ -164,6 +190,15 @@ const PHASES = [
  {id:'d5', due:'2026-10-01', t:'Hoàn thành mọi mục onboarding còn lại', d:'Tất cả phải xong <b>trước ngày 02/10</b>. Gặp lỗi thì liên hệ HR đã gửi offer.', s:['bosch']},
  {id:'d6', due:'2026-10-01', t:'Chuẩn bị cho ngày đầu tiên', d:'Bản cứng thư giới thiệu, CCCD; xác nhận giờ có mặt và địa điểm với HR; tìm đường và chỗ gửi xe.', s:['bosch','tip']},
 ]},
+{id:'P', name:'Chuẩn bị chuyên môn trước ngày đầu', range:'19/09 – 01/10/2026', start:'2026-09-19', end:'2026-10-01', note:'Team bạn vào làm về công cụ phần mềm và CI/CT cho automotive (theo JD), không phải viết firmware ECU. Nên 13 ngày này ưu tiên Git – Python – CI, chứ không phải học AUTOSAR.', tasks:[
+ {id:'p1', due:'2026-09-24', t:'Ôn C cho chắc: con trỏ, struct, volatile, cấp phát bộ nhớ', d:'Đây là thứ người Bosch hay hỏi và hay dùng nhất. Học ở <b>learncpp.com</b> (miễn phí) và tra cứu ở cppreference.com. Mỗi ngày viết tay 1 chương trình nhỏ thay vì chỉ đọc.', s:['jd','tip']},
+ {id:'p2', due:'2026-09-27', t:'Luyện Git thực chiến: branch, rebase, resolve conflict, revert', d:'Chơi hết phần Main + Remote của <b>learngitbranching.js.org</b> (game miễn phí, khoảng 3–4 buổi). Git cơ bản add/commit/push là không đủ khi làm CI.', s:['tip']},
+ {id:'p3', due:'2026-09-30', t:'Python cho tự động hóa: đọc/ghi file, regex, gọi lệnh hệ thống', d:'Sách miễn phí <b>Automate the Boring Stuff with Python</b>. Đây là công cụ bạn sẽ dùng hằng ngày để parse log, gom kết quả test, gọi API Jenkins/GitLab.', s:['jd','tip']},
+ {id:'p4', due:'2026-10-01', t:'Làm quen CI: tự dựng 1 pipeline "hello world"', d:'Theo <b>jenkins.io/doc/tutorials</b> hoặc GitLab CI quick start. Chỉ cần hiểu: job, stage, artifact, runner. Có trải nghiệm này rồi thì tuần đầu ở công ty đỡ ngợp.', s:['jd','tip']},
+ {id:'p5', due:'2026-10-01', t:'Luyện tiếng Anh nói 15 phút/ngày', d:'Môi trường làm việc ở BGSV là tiếng Anh và nhiều review của nhân viên nhấn mạnh điều này. Luyện 3 tình huống: tự giới thiệu, mô tả việc đang làm, nói khi bị kẹt và cần giúp.', s:['jd','tip'], warn:true},
+ {id:'p6', due:'2026-09-30', t:'Dựng sẵn hệ thống ghi chép', d:'Tạo thư mục <b>intern-notes</b> gồm: daily-log (nhật ký ngày), glossary (từ điển thuật ngữ), brag-document (thành tích), mentor-1on1, monthly-report. Xem mẫu ở Sổ tay bên dưới. Ghi chép từ ngày đầu là thứ quyết định báo cáo cuối kỳ dễ hay khổ.', s:['tip']},
+ {id:'p7', due:'2026-10-01', t:'Viết sẵn 5 câu hỏi cho buổi gặp mentor đầu tiên', d:'Gợi ý: (1) 2 tuần đầu em nên đạt được gì? (2) Team đang dùng tool/quy trình nào, đọc tài liệu ở đâu? (3) Em nên hỏi anh/chị qua kênh nào, tần suất thế nào? (4) Có buổi 1:1 hằng tuần được không? (5) Thông tin nào em được phép đưa vào báo cáo cho trường?', s:['tip']},
+]},
 {id:'E', name:'Tuần đầu tiên', range:'02/10 – 09/10/2026', start:'2026-10-02', end:'2026-10-09', tasks:[
  {id:'e1', due:'2026-10-02', t:'Nộp bản cứng thư giới thiệu cho Bosch', s:['bosch','jd']},
  {id:'e2', due:'2026-10-02', t:'Gặp HR và supervisor Bosch, xác nhận các điều kiện trước khi ký', d:'Giờ làm, nhiệm vụ, nội quy, an toàn lao động. Đối chiếu với offer: trợ cấp 4.250.000đ gross/tháng; ăn trưa 60.000đ gross/ngày thực làm; gửi xe 200.000đ gross/tháng; bảo hiểm tai nạn Bảo Việt; nghỉ phép 1 ngày + 1 ngày ốm (cần giấy bác sĩ) mỗi tháng, thêm ngày nghỉ sinh nhật nếu sinh nhật rơi vào kỳ thực tập.', s:['guide','bosch']},
@@ -171,6 +206,9 @@ const PHASES = [
  {id:'e4', due:'2026-10-09', t:'Xin chữ ký supervisor Bosch (Supervisor 2) trên Registration Form', d:'Sau đó mở lại câu trả lời Google Form đã nộp và <b>cập nhật bản form có đủ chữ ký</b>. Bổ sung thông tin supervisor nếu lúc trước còn trống.', s:['reg']},
  {id:'e5', due:'2026-10-09', t:'Hỏi supervisor Bosch: được đưa những gì vào báo cáo gửi VGU?', d:'Mọi thông tin có được từ Bosch đều là bảo mật, tiết lộ cần Bosch đồng ý bằng văn bản. Thống nhất sớm phạm vi nội dung/ảnh dùng cho báo cáo tháng, báo cáo cuối và buổi thuyết trình.', s:['bosch','tip'], warn:true},
  {id:'e6', due:'2026-10-02', t:'Bắt đầu ghi timesheet hằng ngày', d:'Ghi giờ vào/ra và ngày nghỉ. Đây là bằng chứng đủ 900 AHs và là dữ liệu cho báo cáo.', s:['guide','tip']},
+ {id:'e8', due:'2026-10-09', t:'Xin mentor một buổi 1:1 cố định hằng tuần (15–30 phút)', d:'Đây là việc có đòn bẩy lớn nhất trong cả kỳ. Mỗi buổi mang theo: tiến độ 2 phút, 1–2 câu hỏi không gấp đã gom cả tuần, xin feedback về một việc vừa làm, hỏi tuần tới nên ưu tiên gì.', s:['tip'], warn:true},
+ {id:'e9', due:'2026-10-09', t:'Đọc hết tài liệu nội bộ của team trước khi hỏi câu nào', d:'Wiki, README, Confluence, hướng dẫn onboarding. Hỏi lại thứ đã có sẵn trong tài liệu là cách nhanh nhất để bị đánh giá là lười.', s:['tip']},
+ {id:'e10', due:'2026-10-09', t:'Lập glossary thuật ngữ và từ viết tắt', d:'Bosch dùng rất nhiều viết tắt nội bộ (chính tên phòng MS/EDA-XC của bạn là ví dụ). Mỗi lần nghe từ lạ, ghi lại và hỏi vào buổi 1:1 chứ đừng gật gù cho qua.', s:['tip']},
  {id:'e7', due:'2026-10-09', t:'Chốt lịch nộp báo cáo tháng với GVHD VGU', d:'Hạn nộp tùy lịch thực tập, nên hỏi rõ: hạn cụ thể mỗi tháng, nộp qua email hay bản in, có họp định kỳ không.', s:['guide']},
 ]},
 {id:'F', name:'Trong kỳ thực tập', range:'10/2026 – 03/2027', start:'2026-10-10', end:'2027-03-10', note:'Mỗi báo cáo tháng: viết (phần thân 5–15 trang) → supervisor Bosch ký trang Confirmation → nộp GVHD. Hạn dưới đây là gợi ý, lấy theo hạn GVHD chốt.', tasks:[
@@ -183,6 +221,14 @@ const PHASES = [
  {id:'f7', label:'Mỗi báo cáo', t:'Kiểm tra định dạng báo cáo tháng', d:'<ul><li>Thứ tự: bìa → Confirmation (Bosch ký) → mục lục → danh mục hình → danh mục bảng → thân bài → phụ lục → tài liệu tham khảo</li><li>Thân bài gồm 5 phần: Introduction · Description of main duties · Analysis of your tasks · Conclusions & Recommendations · Kế hoạch các tháng tới</li><li>Times New Roman hoặc Arial cỡ 13, giãn dòng 1.5; lề trái 3 cm, các lề khác 2 cm</li><li>Bìa không đánh số; mục lục/danh mục đánh số La Mã; thân bài trở đi đánh số 1, 2, 3</li></ul>Sai định dạng sẽ bị trừ điểm. Báo cáo tháng chiếm 20% điểm.', s:['monthly']},
  {id:'f8', label:'Hằng tháng', t:'Cập nhật tiến độ định kỳ cho GVHD VGU', s:['guide']},
  {id:'f9', label:'Cả kỳ', t:'Theo dõi số giờ làm và cân nhắc khi xin nghỉ', d:'Xem ô “Số giờ thực tập” bên cạnh — tổng giờ khá sát ngưỡng 900 AHs.', s:['guide','tip'], warn:true},
+ {id:'m1', due:'2026-10-31', t:'Mốc tháng 10: chạy được quy trình của team một mình', d:'Cuối tháng đầu bạn nên: tự build được project, tự chạy được pipeline, biết tra log lỗi ở đâu, hiểu luồng làm việc từ ticket đến merge. Chưa cần đóng góp lớn, cần <b>không còn phải hỏi lại những thứ cơ bản</b>.', s:['tip']},
+ {id:'m2', due:'2026-11-30', t:'Mốc tháng 11: script tự động hóa đầu tiên', d:'Tìm một việc thủ công lặp lại trong team (gom báo cáo test, dựng môi trường, đổi tên file hàng loạt) và viết script thay thế. Ghi lại: trước mất bao nhiêu phút, sau còn bao nhiêu. Đây chính là loại đóng góp được nhớ đến khi xét giữ lại.', s:['tip'], warn:true},
+ {id:'m3', due:'2026-12-31', t:'Mốc tháng 12: unit test và static analysis', d:'Học Unity/Ceedling (cho C) hoặc GoogleTest (cho C++), thêm Cppcheck/Clang-Tidy. Đây là phần lõi của chữ CT trong CI/CT — cũng là chỗ dễ ghi điểm nhất với người mới.', s:['tip']},
+ {id:'m4', due:'2027-01-31', t:'Mốc tháng 1: MISRA C và AUTOSAR đủ để hiểu hội thoại', d:'Không cần thuộc rule. Cần đủ vốn từ để không lạc khi đồng nghiệp nói chuyện và biết tra cứu tiếp. Khoảng 1 tuần đọc cho MISRA, 3–4 ngày cho AUTOSAR (Classic vs Adaptive, các lớp Application – RTE – BSW).', s:['tip']},
+ {id:'m5', due:'2027-02-28', t:'Mốc tháng 2: CAN bus và ASPICE cơ bản', d:'CAN để hiểu thứ hệ thống test đang mô phỏng (tài liệu miễn phí của CSS Electronics rất tốt). ASPICE để hiểu vì sao sếp đòi traceability và test coverage — chính việc CI/CT của bạn là bằng chứng cho nó.', s:['tip']},
+ {id:'f20', label:'2 tuần/lần', t:'Cập nhật brag document', d:'Mỗi hai tuần bỏ 10 phút ghi lại: việc đã làm xong, việc đã giúp người khác, tài liệu đã viết, quy trình đã cải thiện. Có số liệu thì ghi số. Đây là nguyên liệu cho báo cáo cuối kỳ, cho CV và cho vòng phỏng vấn full-time — và bạn sẽ quên sạch nếu không ghi ngay.', s:['tip'], warn:true},
+ {id:'f21', due:'2027-01-20', t:'Hỏi thẳng về cơ hội ở lại full-time', d:'Khoảng tháng thứ 4, hỏi mentor/manager: "Em cần thể hiện được những gì để được cân nhắc cho vị trí chính thức, và quy trình thường diễn ra khi nào?" Hỏi sớm còn kịp điều chỉnh; hỏi vào tháng cuối thì đã muộn. Lưu ý: nhiều review cho thấy tỷ lệ intern được giữ lại ở BGSV là <b>không chắc chắn</b>, nên song song vẫn nên chuẩn bị hồ sơ đi nơi khác.', s:['tip'], warn:true},
+ {id:'f22', due:'2027-03-01', t:'Chốt 3 câu chuyện STAR cho phỏng vấn', d:'Mỗi câu chuyện theo cấu trúc Tình huống – Nhiệm vụ – Hành động – Kết quả, ưu tiên cái có con số. Dùng được cho cả buổi bảo vệ ở trường lẫn phỏng vấn công ty.', s:['tip']},
  {id:'f10', due:'2027-01-15', t:'Bắt đầu dựng khung Final Report', d:'Gom dần: ảnh/minh họa được phép dùng, số liệu đóng góp (số dòng code, số module, số cuộc họp…), sơ đồ tổ chức kèm vị trí của bạn, Gantt chart các công việc.', s:['final','tip']},
 ]},
 {id:'G', name:'Hai tuần cuối', range:'11/03 – 25/03/2027', start:'2027-03-11', end:'2027-03-25', tasks:[
@@ -208,6 +254,122 @@ const PHASES = [
  {id:'h10', due:'2027-06-15', label:'Sau khi nộp điểm', t:'Kiểm tra điểm môn Internship trên SIS', s:['done']},
 ]},
 ];
+
+
+// ===== Sổ tay thực tập =====
+const GUIDE = [
+{t:'Nhịp một ngày', b:`<p class="g-lead">Toàn bộ kỳ thực tập được quyết định bởi thứ bạn làm lặp đi lặp lại mỗi ngày, không phải bởi vài việc lớn.</p>
+<h4>10 phút đầu ngày</h4><ul>
+<li>Mở nhật ký hôm nay, viết <b>3 mục tiêu cụ thể</b>. "Sửa xong flaky test X, chạy pass 5/5 lần" chứ không phải "tìm hiểu về CI".</li>
+<li>Đọc lại mục "mai làm gì" của hôm qua.</li>
+<li>Lướt mail/chat chỉ để bắt việc gấp, chưa trả lời chi tiết.</li></ul>
+<h4>Trong ngày</h4><ul>
+<li>Làm việc khó nhất vào buổi sáng khi đầu còn khỏe; để họp và việc vặt cho buổi chiều.</li>
+<li>Bị kẹt thì áp dụng quy tắc 15–30 phút (xem ô kế bên), đừng ngồi im cả buổi.</li>
+<li>Vừa học được gì hoặc vừa sửa được lỗi gì thì <b>ghi ngay 2–3 dòng</b>. Để đến cuối ngày là quên mất phần quan trọng nhất: <i>vì sao</i> nó xảy ra.</li></ul>
+<h4>10 phút cuối ngày</h4>
+<p>Viết nhật ký theo mẫu bên dưới rồi tắt máy. Việc dở dang thì ghi vào "mai làm gì" — ghi ra rồi mới buông được.</p>`},
+
+{t:'Nhịp một tuần', b:`<ul>
+<li><b>Thứ Hai:</b> chọn 1 việc bạn muốn hoàn thành tuần này; chuẩn bị câu hỏi cho buổi 1:1.</li>
+<li><b>Giữa tuần:</b> xin feedback ngắn sau mỗi task quan trọng — "anh xem giúp em cách làm này ổn chưa, có gì nên khác đi không ạ". Đừng đợi tới đánh giá giữa kỳ mới biết mình lệch hướng.</li>
+<li><b>Thứ Sáu (15 phút):</b> đọc lại 5 ngày nhật ký, tóm thành 3–5 dòng "tuần này mình làm được gì, học được gì", chép sang brag document.</li>
+<li><b>Cuối tháng:</b> nhật ký tuần chính là nguyên liệu có sẵn cho báo cáo tháng nộp trường. Viết báo cáo tháng sẽ mất 1–2 tiếng thay vì cả cuối tuần.</li>
+<li><b>Ngày phép:</b> dùng rải đều sau các đợt cao điểm, đừng dồn cuối kỳ. Nhưng nhớ ô "số giờ thực tập" — tổng giờ của bạn khá sát ngưỡng 900 AHs.</li></ul>`},
+
+{t:'Mẫu nhật ký cuối ngày', w:1, b:`<p class="g-lead">Chép mẫu này vào một file mỗi ngày, đặt tên theo ngày (2026-10-02.md). Đây là thứ sẽ cứu bạn khi viết báo cáo tháng, báo cáo cuối và khi đi phỏng vấn.</p>
+<pre># 2026-10-02 (Thứ Sáu) — Tuần 1
+
+## 3 mục tiêu hôm nay
+1. …
+2. …
+3. …
+
+## Đã làm gì
+- (ghi cụ thể, có thể lần lại được: tên task, tên file, link commit)
+
+## Học được gì
+- (một khái niệm kỹ thuật mới, dù nhỏ — viết theo kiểu người ngoài đọc cũng hiểu)
+
+## Bị kẹt ở đâu
+- (kể cả khi đã tự gỡ được — ghi luôn cách gỡ, lần sau khỏi mò lại)
+
+## Mai làm gì
+1. …
+
+## Từ mới / viết tắt nghe được hôm nay
+- ABC = … (chưa rõ thì để trống, hỏi trong buổi 1:1)</pre>
+<p><b>Một quy tắc không được phá:</b> ghi <i>bài học</i>, không ghi <i>dữ liệu công ty</i>. Xem ô "Bảo mật" bên dưới.</p>`},
+
+{t:'Quy tắc 15–30 phút khi bị kẹt', b:`<p class="g-lead">Lỗi lớn nhất của intern không phải là hỏi nhiều, mà là im lặng khi kẹt.</p>
+<p>Tự loay hoay tối đa <b>15 phút</b> với việc đơn giản, <b>30 phút</b> với việc phức tạp. Mục tiêu của khoảng thời gian đó không phải tự giải bằng mọi giá, mà là thu thập đủ dữ kiện để câu hỏi của bạn có chất lượng:</p>
+<ol><li>Tìm trong tài liệu nội bộ trước (wiki, README), không phải Google trước.</li>
+<li>Đọc kỹ thông báo lỗi, đừng lướt qua.</li>
+<li>Thử 1–2 giả thuyết cụ thể.</li>
+<li>Viết ra: đã thử gì, kết quả ra sao, đang nghi gì.</li></ol>
+<h4>Hỏi thế nào</h4>
+<p class="bad">"Anh ơi pipeline em lỗi, em không biết sao."</p>
+<p class="good">"Em chạy stage build của job X thì gặp lỗi [dán đúng dòng log]. Em đã thử build sạch lại — vẫn lỗi; so với log tuần trước thì khác ở bước cài dependency Y. Em nghi lệch version toolchain nhưng chưa biết kiểm tra thế nào cho đúng. Anh chỉ em hướng kiểm tra được không ạ?"</p>
+<p>Việc gấp và chặn tiến độ thì hỏi ngay qua chat. Việc không gấp thì gom lại cho buổi 1:1.</p>`},
+
+{t:'Bảo mật: ghi chép sao cho an toàn', b:`<p class="g-lead">Email offer ghi rõ: mọi thông tin có được từ Bosch là bảo mật, tiết lộ ra ngoài cần Bosch đồng ý bằng văn bản. Điều này va thẳng vào việc bạn phải nộp báo cáo cho trường.</p>
+<ul><li><b>Tuần đầu phải hỏi mentor:</b> em được đưa những gì vào báo cáo nộp trường? Có cần ai duyệt trước không? Ảnh chụp màn hình có được không?</li>
+<li>Không chép ra ngoài: mã nguồn thật, tên dự án/khách hàng thật, số liệu sản phẩm, log build thật, sơ đồ hệ thống nội bộ.</li>
+<li>Thay vào đó ghi phần khái quát hóa được:</li></ul>
+<p class="bad">Sai: "Sửa file brake_ecu_v3/can_driver.c dòng 245, lỗi timeout CAN ID 0x18F trên xe khách hàng X."</p>
+<p class="good">Đúng: "Gặp một dạng lỗi timeout trên bus CAN do cơ chế retry không có backoff. Cách chẩn đoán: log timestamp từng frame rồi đối chiếu với timing trong datasheet."</p>
+<p>Tự hỏi trước khi ghi: <i>nếu dòng này lọt ra ngoài, có làm lộ thông tin sản phẩm hay khách hàng không?</i> Có thì bỏ chi tiết, giữ bài học. Cách viết này còn luyện đúng kỹ năng bạn cần khi đi phỏng vấn — nhà tuyển dụng không muốn nghe chi tiết nội bộ Bosch, họ muốn nghe bạn tư duy thế nào.</p>`},
+
+{t:'Đóng góp nào được nhớ đến', b:`<p class="g-lead">Bạn làm ở team công cụ và CI/CT — đây là mảnh đất dễ tạo dấu ấn nhất cho người mới, vì nỗi đau của team rất rõ ràng và đo được.</p>
+<ul><li><b>Tự động hóa việc thủ công:</b> gom báo cáo test, dựng môi trường, xử lý file hàng loạt.</li>
+<li><b>Sửa flaky test</b> — loại test lúc pass lúc fail. Đây là nỗi đau kinh điển của mọi team CI và gần như luôn có sẵn việc để làm.</li>
+<li><b>Rút ngắn thời gian build/pipeline:</b> cache dependency, chạy song song, bỏ bước thừa.</li>
+<li><b>Viết tài liệu cho người sau:</b> README cho tool bạn maintain, hướng dẫn onboarding cho intern khóa sau. Việc này "vô hình" nhưng được nhớ rất lâu.</li></ul>
+<h4>Luôn ghi lại bằng con số</h4>
+<table><tr><th>Yếu</th><th>Mạnh</th></tr>
+<tr><td>"Đã cải thiện pipeline"</td><td>"Giảm thời gian build trung bình từ 18 xuống 11 phút nhờ bật cache dependency"</td></tr>
+<tr><td>"Sửa vài test lỗi"</td><td>"Sửa 3 flaky test khiến pipeline fail ngẫu nhiên ~15% số lần chạy, kéo xuống dưới 2%"</td></tr>
+<tr><td>"Viết script tự động"</td><td>"Script thay quy trình thủ công 45 phút/tuần, nay chạy trong 2 phút"</td></tr></table>
+<p>Muốn có con số thì phải <b>đo trước khi sửa</b>. Ngày nhận việc, bấm giờ xem việc thủ công đó mất bao lâu.</p>`},
+
+{t:'8 lỗi intern hay mắc', b:`<ol>
+<li><b>Im lặng khi kẹt</b> vì sợ bị đánh giá. Việc nhỏ thành trễ deadline lớn. → quy tắc 15–30 phút.</li>
+<li><b>Hứa quá khả năng.</b> Nhận task rồi buột miệng "chiều nay xong". → dành 5 phút ước lượng trước khi cam kết, hoặc nói "em nghĩ khoảng 2 ngày, em cập nhật lại sau khi tìm hiểu".</li>
+<li><b>Không đọc tài liệu nội bộ</b> trước khi hỏi.</li>
+<li><b>Không tự test trước khi nhờ review.</b> Trước khi tạo merge request: build sạch từ đầu, chạy test liên quan ít nhất một lần, tự đọc lại diff của mình như người ngoài.</li>
+<li><b>Làm một mình, không cập nhật tiến độ</b> → team không biết bạn đang ở đâu, dễ lệch hướng cả tuần.</li>
+<li><b>Không ghi lại lỗi đã gặp</b> → lặp lại đúng lỗi cũ, mentor phải giải thích lại.</li>
+<li><b>Đọc lý thuyết nhiều, tay chạm code ít.</b> Đây là bẫy của người học trường lớp giỏi. Giữ tỷ lệ 30% đọc – 70% làm: học xong khái niệm nào, trong 48 giờ phải áp dụng vào một việc thật.</li>
+<li><b>Phòng thủ khi bị review code.</b> Đọc hết comment rồi hãy trả lời; không đồng ý thì hỏi lý do để hiểu, đừng cãi.</li></ol>`},
+
+{t:'Những gì đã biết về BGSV và team của bạn', b:`<p class="g-lead">Mình đã tra cứu; phần nào có nguồn và phần nào là suy đoán đều ghi rõ.</p>
+<ul>
+<li><b>Team bạn làm công cụ và CI/CT, không phải firmware ECU.</b> JD ghi rõ: phân tích yêu cầu phần mềm automotive, sửa lỗi trong software tool, tham gia thiết kế software tool và CI/CT. Nên đừng dồn sức học AUTOSAR trước ngày đi làm — Git, Python, Jenkins mới là thứ dùng ngay. <span class="tagx">có nguồn: JD đăng công khai</span></li>
+<li><b>"XC" là Cross-Domain Computing Solutions</b>, một đơn vị của Bosch khoảng 17.000 người toàn cầu về phần mềm/điện tử xe. Còn <b>"EDA"</b> thì không có tài liệu chính thức nào giải nghĩa; cùng mã EDA còn xuất hiện ở tin tuyển phiên dịch tiếng Trung và trợ giảng tiếng Anh, nên nhiều khả năng đây là mã tổ chức nội bộ chứ không phải thuật ngữ kỹ thuật. Cứ hỏi mentor trong tuần đầu. <span class="tagx">suy đoán có cơ sở</span></li>
+<li><b>Giờ làm linh hoạt (flexitime)</b>, thứ Hai–thứ Sáu; Bosch có chính sách bù giờ. <span class="tagx">có nguồn</span></li>
+<li><b>Môi trường tiếng Anh.</b> Review nhân viên nhắc đi nhắc lại rằng tiếng Anh là điều kiện để trụ được, kể cả kỹ thuật giỏi. <span class="tagx">ý kiến nhiều người</span></li>
+<li><b>Mức hỗ trợ của bạn đúng chuẩn công ty</b> — ăn trưa 60k/ngày và gửi xe 200k/tháng khớp chính xác chính sách chung của BGSV. Trợ cấp 4,25 triệu thấp hơn trung bình thực tập IT ở TP.HCM một chút (~4,66 triệu theo số liệu Indeed), nhưng đi kèm phụ cấp và bảo hiểm mà nhiều nơi không có. <span class="tagx">có nguồn</span></li>
+<li><b>Cơ hội lên chính thức: không chắc chắn.</b> Vài review và thảo luận diễn đàn nói intern ở đây ít khi được chuyển thành nhân viên chính thức, kèm lo ngại về dư nhân sự mảng automotive. Không có số liệu chính thức. Nên: cứ nỗ lực để được giữ, nhưng tháng thứ 4 hãy hỏi thẳng về quy trình, và vẫn chuẩn bị hồ sơ cho nơi khác. <span class="tagx">ý kiến cá nhân, không phải số liệu</span></li>
+<li>Chưa tra được: lịch onboarding tuần đầu, hệ thống nội bộ, quy định thẻ/VPN/laptop, nội dung NDA cho intern. Những thứ này chỉ biết khi vào — cứ hỏi HR và mentor, đừng ngại.</li></ul>`},
+
+{t:'Lộ trình học 6 tháng', w:1, b:`<table class="g-road"><tr><th>Giai đoạn</th><th>Học gì</th><th>Vì sao</th><th>Tài nguyên miễn phí</th></tr>
+<tr><td>Trước 02/10</td><td>C (con trỏ, struct, volatile) · Git nâng cao · Python automation · 1 pipeline CI thử</td><td>Dùng được ngay tuần đầu</td><td>learncpp.com · learngitbranching.js.org · automatetheboringstuff.com · jenkins.io/doc/tutorials</td></tr>
+<tr><td>Tháng 10</td><td>Quy trình của chính team: build, pipeline, ticket, merge request</td><td>Hết ngợp, tự chạy được việc cơ bản</td><td>Wiki nội bộ + hỏi mentor</td></tr>
+<tr><td>Tháng 11</td><td>Python nâng cao, Jenkinsfile / .gitlab-ci.yml, Docker cơ bản</td><td>Đủ sức viết script tự động hóa đầu tiên</td><td>docs.gitlab.com/ci · jenkins.io</td></tr>
+<tr><td>Tháng 12</td><td>Unit test C/C++ (Unity + Ceedling hoặc GoogleTest), static analysis (Cppcheck, Clang-Tidy)</td><td>Lõi của chữ CT trong CI/CT</td><td>throwtheswitch.org · google.github.io/googletest · clang.llvm.org/extra/clang-tidy</td></tr>
+<tr><td>Tháng 1</td><td>MISRA C, AUTOSAR nền tảng (Classic vs Adaptive, Application–RTE–BSW)</td><td>Hiểu hội thoại và log của đồng nghiệp</td><td>embedded.com · embetronicx.com · autosar.org</td></tr>
+<tr><td>Tháng 2</td><td>CAN bus, ASPICE cơ bản (SWE.1–SWE.6)</td><td>Hiểu thứ hệ thống test mô phỏng, và vì sao sếp đòi traceability</td><td>csselectronics.com/pages/can-bus-ultimate-guide · kvaser.com/can-protocol-tutorial</td></tr>
+<tr><td>Tháng 3</td><td>Không học dàn trải nữa. Đào sâu 1–2 mảng đụng nhiều nhất, gom số liệu đóng góp, viết báo cáo cuối và luyện thuyết trình</td><td>Biến 6 tháng thành câu chuyện kể được</td><td>interrupt.memfault.com · embeddedartistry.com/beginners</td></tr></table>
+<p class="g-note">Bạn nói quỹ thời gian tùy tuần. Vậy thì quy tắc là: <b>nhật ký cuối ngày 10 phút là bắt buộc, không thương lượng</b>; phần học thêm thì tuần nào rảnh học bù, tuần nào bận thì bỏ qua. Đừng bỏ nhật ký — nó rẻ nhất mà giá trị nhất.</p>`},
+];
+
+function renderGuide(){
+  return '<section class="guide" id="so-tay"><div class="guide-head"><h2>Sổ tay thực tập</h2>'
+    + '<p>Phần checklist ở trên là thủ tục bắt buộc. Phần này là cách làm việc — đọc một lần trước ngày 02/10, rồi quay lại khi cần.</p></div>'
+    + '<div class="guide-grid">'
+    + GUIDE.map(function(g){ return '<article class="gcard' + (g.w ? ' wide' : '') + '"><h3>' + esc(g.t) + '</h3>' + g.b + '</article>'; }).join('')
+    + '</div></section>';
+}
 
 // ---- state ----
 let done = new Set();
@@ -242,7 +404,7 @@ function render(){
   let h = `<header class="top">
     <div><div class="eyebrow">Hoàng Minh Khoa · VGU ECE · Module 61ECE401</div>
     <h1>Lộ trình thực tập Embedded Developer tại Bosch</h1>
-    <p class="sub">Mọi việc cần làm từ hôm nay đến khi có điểm, tổng hợp từ email offer, JD và bộ tài liệu thực tập của ECE. Tick vào ô khi xong — tiến độ được lưu lại.</p></div>
+    <p class="sub">Mọi việc cần làm từ hôm nay đến khi có điểm, tổng hợp từ email offer, JD và bộ tài liệu thực tập của ECE. Tick vào ô khi xong — tiến độ được lưu lại. Cuối trang có <a class="jump" href="#so-tay">Sổ tay thực tập</a>: nhịp ngày, cách ghi chép, cách gây ấn tượng.</p></div>
     <div class="status">
       <div class="stat"><span class="k">Tiến độ</span><span class="v mono">${nDone}/${req.length}</span><div class="bar"><i style="width:${pct}%"></i></div></div>
       <div class="stat"><span class="k">Việc gần nhất</span>${nx?`<span class="next-title">${esc(nx.t)}</span><span><span class="chip" data-s="${chipFor(nx).s}">${esc(chipFor(nx).txt)}</span></span>`:'<span class="next-title">Đã xong tất cả</span>'}</div>
@@ -306,6 +468,7 @@ function render(){
       <div>Bosch HR<span>Reply vào email offer</span></div>
     </div></div>
   </aside></div>`;
+  h += renderGuide();
   document.getElementById('root').innerHTML = h;
 }
 // ---- lưu tiến độ: localStorage + Supabase (tùy chọn) ----
