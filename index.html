@@ -316,7 +316,7 @@ var cfg = null, lastError = '';
 try { cfg = JSON.parse(localStorage.getItem(CFG_KEY) || 'null'); } catch(e){}
 // Nhận cấu hình từ link chia sẻ: <trang>#sync=<base64>
 try {
-  var hs = (location.hash || '').match(/sync=([A-Za-z0-9_\-=]+)/);
+  var hs = ((location.hash || '') + '&' + (location.search || '')).match(/sync=([A-Za-z0-9_\-=]+)/);
   if(hs){
     var o = JSON.parse(atob(hs[1].replace(/-/g,'+').replace(/_/g,'/')));
     if(o && o.url && o.key){
@@ -417,7 +417,7 @@ function openCfg(){
 function say(msg, kind){
   var el = document.getElementById('cfg-msg');
   if(!el) return;
-  el.textContent = msg || ''; el.hidden = !msg; el.dataset.kind = kind || '';
+  el.innerHTML = ''; el.textContent = msg || ''; el.hidden = !msg; el.dataset.kind = kind || '';
 }
 
 function check(){
@@ -466,10 +466,23 @@ function buildDialog(){
     if(!url || !key) return say('Điền Project URL và key trước đã.', 'bad');
     if(location.protocol === 'file:') return say('Link chỉ dùng được khi trang chạy trên web (GitHub Pages). Trang này đang mở từ ổ đĩa nên điện thoại không mở được.', 'bad');
     var tok = btoa(JSON.stringify({url: url, key: key})).replace(/\+/g,'-').replace(/\//g,'_');
-    var link = location.origin + location.pathname + '#sync=' + tok;
-    var done2 = ()=> say('Đã copy link. Gửi nó cho chính mình qua Zalo/Messenger/email, mở trên điện thoại là đồng bộ luôn. Link có chứa key nên đừng đăng công khai.', 'ok');
-    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done2, ()=>say(link, ''));
-    else say(link, '');
+    var link = location.origin + location.pathname + '?v=' + Date.now() + '#sync=' + tok;
+    var show = (pre)=>{
+      var el = document.getElementById('cfg-msg');
+      el.hidden = false; el.dataset.kind = 'ok';
+      el.innerHTML = '';
+      var p1 = document.createElement('div'); p1.textContent = pre; el.appendChild(p1);
+      var ta = document.createElement('textarea');
+      ta.readOnly = true; ta.rows = 3; ta.value = link; ta.id = 'cfg-linkbox';
+      ta.style.cssText = 'width:100%;margin-top:8px;font:12px/1.4 ui-monospace,monospace;word-break:break-all;padding:8px;border-radius:8px;border:1px solid currentColor;background:transparent;color:inherit';
+      ta.onclick = ()=> ta.select();
+      el.appendChild(ta);
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText)
+      navigator.clipboard.writeText(link).then(
+        ()=> show('Đã copy link. Gửi cho chính mình qua Zalo/Messenger/email rồi mở trên điện thoại. Nếu app chat cắt mất phần sau dấu #, copy thủ công ô dưới đây:'),
+        ()=> show('Copy thủ công link dưới đây (bấm vào ô để bôi đen hết):'));
+    else show('Copy thủ công link dưới đây (bấm vào ô để bôi đen hết):');
   };
   d.querySelector('#cfg-export').onclick = ()=>{
     var blob = new Blob([JSON.stringify({done:[...done], exportedAt:new Date().toISOString()}, null, 2)], {type:'application/json'});
